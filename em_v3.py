@@ -10,17 +10,19 @@ import time
         -RPi.GPIO
 '''
 
-#ledList = [2,3,4,17,27,22,10,9,11] #GPIO pinouts
-ledList = [3,5,7,11,13,15,19,21,23] #pin number
+# ledList = [2,3,4,17,27,22,10,9,11] #GPIO pinouts
+ledList = [3, 5, 7, 11, 13, 15, 19, 21, 23]  # pin number
 toggle = 1
+
 
 def init():
     '''Procedure run to initialize RPi.GPIO.'''
-    #GPIO.setmode(GPIO.BCM)
+    # GPIO.setmode(GPIO.BCM)
     GPIO.setmode(GPIO.BOARD)
     GPIO.setwarnings(False)
-    GPIO.setup(40,GPIO.IN,pull_up_down=GPIO.PUD_UP)
+    GPIO.setup(40, GPIO.IN, pull_up_down=GPIO.PUD_UP)
     initLED()
+
 
 def initLED():
     counter = 0
@@ -31,32 +33,38 @@ def initLED():
         counter += 1
     allOff()
 
+
 def on(x):
     '''Turns on (x) LED.'''
-    GPIO.setup(x,GPIO.OUT)
-    GPIO.output(x,GPIO.LOW)
+    GPIO.setup(x, GPIO.OUT)
+    GPIO.output(x, GPIO.LOW)
+
 
 def off(x):
     '''Turns off (x) LED.'''
-    GPIO.setup(x,GPIO.OUT)
-    GPIO.output(x,GPIO.HIGH)
+    GPIO.setup(x, GPIO.OUT)
+    GPIO.output(x, GPIO.HIGH)
+
 
 def allOff():
     for led in ledList:
         off(led)
+
 
 def shutdown():
     '''Shutdown all LEDs and perform cleanup.'''
     allOff()
     GPIO.cleanup()
 
+
 def light(x):
     '''Activates (x) lights in sequence.'''
-    on(ledList[0]) #central candle always on
+    on(ledList[0])  # central candle always on
     y = 1
     while y < x + 1:
         on(ledList[y])
-        y+=1
+        y += 1
+
 
 def power(ev=None):
     global toggle
@@ -66,11 +74,13 @@ def power(ev=None):
     else:
         allOff()
 
+
 def main():
     GPIO.add_event_detect(40, GPIO.FALLING, callback=power)
     while True:
-        time.sleep(5) #necessary to prevent 100% CPU consumption
+        time.sleep(5)  # necessary to prevent 100% CPU consumption
         pass
+
 
 def getCandles():
     '''Retrieves local time, compares it, determines number of "candles"
@@ -89,11 +99,11 @@ def getCandles():
                 while days <= 31:
                     if today[2] == days:
                         if today[3] >= 17:
-                            candles+=1
+                            candles += 1
                             break
                         break
-                    candles+=1
-                    days+=1
+                    candles += 1
+                    days += 1
             elif today[1] == 1 and today[2] == 1:
                 candles = 8
                 if today[3] >= 17:
@@ -101,7 +111,8 @@ def getCandles():
         if candles > 0:
             light(candles)
 
-if __name__=='__main__':
+
+if __name__ == '__main__':
     init()
     try:
         main()
